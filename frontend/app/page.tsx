@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-type Screen = 'menu' | 'welcome' | 'biometric' | 'religion' | 'assets' | 'documents' | 'witnesses' | 'success';
+type Screen = 'menu' | 'welcome' | 'biometric' | 'religion' | 'assets' | 'documents' | 'executor' | 'witnesses' | 'success';
 
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('menu');
@@ -19,6 +19,7 @@ export default function Home() {
   const [witness2Verified, setWitness2Verified] = useState(false);
   const [witness1ICInserted, setWitness1ICInserted] = useState(false);
   const [witness2ICInserted, setWitness2ICInserted] = useState(false);
+  const [selectedExecutor, setSelectedExecutor] = useState<'smart-contract' | 'amanah-raya' | 'private-individual' | null>(null);
 
   // Screen 1: Reset IC detection when entering welcome screen
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function Home() {
   }, [currentScreen]);
 
   const getScreenNumber = (screen: Screen): number => {
-    const order: Screen[] = ['menu', 'welcome', 'biometric', 'religion', 'assets', 'documents', 'witnesses', 'success'];
+    const order: Screen[] = ['menu', 'welcome', 'biometric', 'religion', 'assets', 'documents', 'executor', 'witnesses', 'success'];
     const index = order.indexOf(screen);
     return index === 0 ? 0 : index; // Menu is screen 0, others start from 1
   };
@@ -97,7 +98,7 @@ export default function Home() {
             <span style={{ color: '#ffffff', fontSize: '20px', fontWeight: 600 }}>Digital Will Service</span>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            {[1, 2, 3, 4, 5, 6, 7].map((num) => {
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => {
               const screenNum = getScreenNumber(currentScreen);
               const isActive = num === screenNum;
               const isCompleted = num < screenNum;
@@ -1280,7 +1281,7 @@ export default function Home() {
             </div>
 
             <button
-              onClick={() => setCurrentScreen('witnesses')}
+              onClick={() => setCurrentScreen('executor')}
               style={{
                 width: '100%',
                 marginTop: '40px',
@@ -1305,10 +1306,281 @@ export default function Home() {
               }}
             >
               {Object.keys(uploadedDocs).length > 0 
-                ? `Continue to Witness Authentication (${Object.keys(uploadedDocs).length} document${Object.keys(uploadedDocs).length > 1 ? 's' : ''} uploaded)`
-                : 'Continue to Witness Authentication (Skip Documents)'
+                ? `Continue to Executor Selection (${Object.keys(uploadedDocs).length} document${Object.keys(uploadedDocs).length > 1 ? 's' : ''} uploaded)`
+                : 'Continue to Executor Selection (Skip Documents)'
               }
             </button>
+          </div>
+        )}
+
+        {currentScreen === 'executor' && (
+          <div style={{ maxWidth: '1200px', width: '100%' }}>
+            <h2 style={{ fontSize: '42px', fontWeight: 700, color: '#003366', marginBottom: '20px', textAlign: 'center' }}>
+              Select Digital Executor
+            </h2>
+            <p style={{ fontSize: '24px', color: '#666', marginBottom: '40px', textAlign: 'center' }}>
+              Choose who will be responsible for unlocking and executing your will upon confirmed death.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', marginBottom: '40px' }}>
+              {/* Option 1: The Smart Contract */}
+              <button
+                onClick={() => setSelectedExecutor('smart-contract')}
+                style={{
+                  backgroundColor: '#ffffff',
+                  padding: '40px',
+                  borderRadius: '16px',
+                  border: selectedExecutor === 'smart-contract' ? '4px solid #003366' : '2px solid #ddd',
+                  boxShadow: selectedExecutor === 'smart-contract' 
+                    ? '0 4px 12px rgba(0,51,102,0.3)' 
+                    : '0 2px 8px rgba(0,0,0,0.1)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedExecutor !== 'smart-contract') {
+                    e.currentTarget.style.borderColor = '#003366';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,51,102,0.2)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedExecutor !== 'smart-contract') {
+                    e.currentTarget.style.borderColor = '#ddd';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                  }
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px' }}>
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '12px',
+                    backgroundColor: '#f0f0f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '48px',
+                    flexShrink: 0
+                  }}>
+                    🔒
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ 
+                      fontSize: '32px', 
+                      fontWeight: 700, 
+                      color: '#003366', 
+                      marginBottom: '12px',
+                      marginTop: 0
+                    }}>
+                      The Smart Contract
+                    </h3>
+                    <p style={{ 
+                      fontSize: '22px', 
+                      color: '#666', 
+                      lineHeight: '1.6',
+                      margin: 0
+                    }}>
+                      Automated digital executor that unlocks your will once death is confirmed through official government channels.
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              {/* Option 2: Amanah Raya (Recommended) */}
+              <button
+                onClick={() => setSelectedExecutor('amanah-raya')}
+                style={{
+                  backgroundColor: '#ffffff',
+                  padding: '40px',
+                  borderRadius: '16px',
+                  border: selectedExecutor === 'amanah-raya' ? '4px solid #003366' : '2px solid #ddd',
+                  boxShadow: selectedExecutor === 'amanah-raya' 
+                    ? '0 4px 12px rgba(0,51,102,0.3)' 
+                    : '0 2px 8px rgba(0,0,0,0.1)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedExecutor !== 'amanah-raya') {
+                    e.currentTarget.style.borderColor = '#003366';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,51,102,0.2)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedExecutor !== 'amanah-raya') {
+                    e.currentTarget.style.borderColor = '#ddd';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                  }
+                }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  backgroundColor: '#28a745',
+                  color: '#ffffff',
+                  padding: '8px 20px',
+                  borderRadius: '20px',
+                  fontSize: '20px',
+                  fontWeight: 600
+                }}>
+                  Recommended
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px' }}>
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '12px',
+                    backgroundColor: '#f0f0f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '48px',
+                    flexShrink: 0
+                  }}>
+                    🏛️
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ 
+                      fontSize: '32px', 
+                      fontWeight: 700, 
+                      color: '#003366', 
+                      marginBottom: '12px',
+                      marginTop: 0
+                    }}>
+                      Amanah Raya
+                    </h3>
+                    <div style={{ marginBottom: '12px' }}>
+                      <p style={{ 
+                        fontSize: '22px', 
+                        color: '#666', 
+                        lineHeight: '1.6',
+                        margin: '0 0 8px 0'
+                      }}>
+                        Government-backed trustee
+                      </p>
+                      <ul style={{ 
+                        fontSize: '20px', 
+                        color: '#666', 
+                        lineHeight: '1.8',
+                        margin: 0,
+                        paddingLeft: '24px'
+                      }}>
+                        <li>Automatic verification through JPN</li>
+                        <li>Legally recognized and protected</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              {/* Option 3: Private Individual */}
+              <button
+                onClick={() => setSelectedExecutor('private-individual')}
+                style={{
+                  backgroundColor: '#ffffff',
+                  padding: '40px',
+                  borderRadius: '16px',
+                  border: selectedExecutor === 'private-individual' ? '4px solid #003366' : '2px solid #ddd',
+                  boxShadow: selectedExecutor === 'private-individual' 
+                    ? '0 4px 12px rgba(0,51,102,0.3)' 
+                    : '0 2px 8px rgba(0,0,0,0.1)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedExecutor !== 'private-individual') {
+                    e.currentTarget.style.borderColor = '#003366';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,51,102,0.2)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedExecutor !== 'private-individual') {
+                    e.currentTarget.style.borderColor = '#ddd';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                  }
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px' }}>
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '12px',
+                    backgroundColor: '#f0f0f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '48px',
+                    flexShrink: 0
+                  }}>
+                    👤
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ 
+                      fontSize: '32px', 
+                      fontWeight: 700, 
+                      color: '#003366', 
+                      marginBottom: '12px',
+                      marginTop: 0
+                    }}>
+                      Private Individual
+                    </h3>
+                    <p style={{ 
+                      fontSize: '22px', 
+                      color: '#666', 
+                      lineHeight: '1.6',
+                      margin: '0 0 8px 0'
+                    }}>
+                      Appoint a trusted person (e.g., Spouse, Child, or Lawyer).
+                    </p>
+                    <p style={{ 
+                      fontSize: '20px', 
+                      color: '#999', 
+                      lineHeight: '1.6',
+                      margin: 0,
+                      fontStyle: 'italic'
+                    }}>
+                      Requirements: Executor must use the JPN Verification App; Requires biometric verification for access.
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {selectedExecutor && (
+              <button
+                onClick={() => setCurrentScreen('witnesses')}
+                style={{
+                  width: '100%',
+                  padding: '24px',
+                  fontSize: '28px',
+                  fontWeight: 600,
+                  backgroundColor: '#003366',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,51,102,0.3)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,51,102,0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,51,102,0.3)';
+                }}
+              >
+                Confirm Selection
+              </button>
+            )}
           </div>
         )}
 
@@ -1586,6 +1858,7 @@ export default function Home() {
                 setUploadedDocs({});
                 setWitness1Verified(false);
                 setWitness2Verified(false);
+                setSelectedExecutor(null);
               }}
               style={{
                 padding: '24px 60px',
