@@ -129,7 +129,7 @@ export default function Home() {
       <div style={{ 
         flex: 1, 
         display: 'flex', 
-        alignItems: currentScreen === 'assets' ? 'flex-start' : 'center', 
+        alignItems: (currentScreen === 'assets' || currentScreen === 'executor') ? 'flex-start' : 'center', 
         justifyContent: 'center', 
         padding: '40px',
         overflowY: 'auto',
@@ -1314,11 +1314,20 @@ export default function Home() {
         )}
 
         {currentScreen === 'executor' && (
-          <div style={{ maxWidth: '1200px', width: '100%' }}>
-            <h2 style={{ fontSize: '42px', fontWeight: 700, color: '#003366', marginBottom: '20px', textAlign: 'center' }}>
+          <div style={{ maxWidth: '1200px', width: '100%', paddingTop: '20px', paddingBottom: '20px' }}>
+            <h2 style={{ fontSize: '42px', fontWeight: 700, color: '#003366', marginTop: '0', marginBottom: '20px', textAlign: 'center' }}>
               Select Digital Executor
             </h2>
-            <p style={{ fontSize: '24px', color: '#666', marginBottom: '40px', textAlign: 'center' }}>
+            <p style={{ 
+              fontSize: '24px', 
+              color: '#666', 
+              marginBottom: '40px', 
+              textAlign: 'center',
+              lineHeight: '1.6',
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
+              padding: '0 20px'
+            }}>
               Choose who will be responsible for unlocking and executing your will upon confirmed death.
             </p>
 
