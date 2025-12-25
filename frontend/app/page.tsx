@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type Screen = 'menu' | 'welcome' | 'biometric' | 'religion' | 'assets' | 'documents' | 'executor' | 'witnesses' | 'success';
 
@@ -35,6 +35,7 @@ export default function Home() {
       setBiometricProgress(0);
     }
   }, [currentScreen]);
+
 
   const getScreenNumber = (screen: Screen): number => {
     const order: Screen[] = ['menu', 'welcome', 'biometric', 'religion', 'assets', 'documents', 'executor', 'witnesses', 'success'];
@@ -95,7 +96,7 @@ export default function Home() {
             }}>
               JPN
             </div>
-            <span style={{ color: '#ffffff', fontSize: '20px', fontWeight: 600 }}>Digital Will Service</span>
+            <span style={{ color: '#ffffff', fontSize: '20px', fontWeight: 600 }}>Citizen Nominee Activation</span>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => {
@@ -129,7 +130,7 @@ export default function Home() {
       <div style={{ 
         flex: 1, 
         display: 'flex', 
-        alignItems: (currentScreen === 'assets' || currentScreen === 'executor') ? 'flex-start' : 'center', 
+          alignItems: (currentScreen === 'assets' || currentScreen === 'executor') ? 'flex-start' : 'center',
         justifyContent: 'center', 
         padding: '40px',
         overflowY: 'auto',
@@ -172,7 +173,7 @@ export default function Home() {
                   margin: 0
                 }}>
                   JPN Digital Kiosk
-                </h1>
+          </h1>
               </div>
               <p style={{ 
                 fontSize: '28px', 
@@ -287,7 +288,7 @@ export default function Home() {
                 </p>
               </button>
 
-              {/* Service 4: Digital Will - Active */}
+              {/* Service 4: Citizen Nominee Activation - Active */}
               <button
                 onClick={() => setCurrentScreen('welcome')}
                 style={{
@@ -322,7 +323,7 @@ export default function Home() {
                   fontWeight: 600
                 }}>
                   NEW
-                </div>
+        </div>
                 <div style={{ fontSize: '64px', marginBottom: '20px' }}>📜</div>
                 <h3 style={{ 
                   fontSize: '32px', 
@@ -330,14 +331,14 @@ export default function Home() {
                   color: '#003366',
                   margin: '0 0 10px 0'
                 }}>
-                  Digital Will
+                  Citizen Nominee Activation
                 </h3>
                 <p style={{ 
                   fontSize: '20px', 
                   color: '#666',
                   margin: 0
                 }}>
-                  Wasiat Digital
+                  Activate Nominee
                 </p>
               </button>
             </div>
@@ -347,7 +348,7 @@ export default function Home() {
         {currentScreen === 'welcome' && (
           <div style={{ textAlign: 'center', maxWidth: '800px', width: '100%' }}>
             <h1 style={{ fontSize: '48px', fontWeight: 700, color: '#003366', marginBottom: '24px' }}>
-              Welcome to JPN Digital Will Service
+              Welcome to Citizen Nominee Activation
             </h1>
             <p style={{ fontSize: '24px', color: '#666', marginBottom: '20px' }}>
               Please insert your MyKad into the card reader
@@ -960,7 +961,7 @@ export default function Home() {
               >
                 Non-Muslim
               </button>
-            </div>
+        </div>
           </div>
         )}
 
@@ -1156,8 +1157,8 @@ export default function Home() {
                           Remove
                         </button>
                       )}
-                    </div>
-                  );
+    </div>
+  );
                 })}
               </div>
 
@@ -1599,7 +1600,7 @@ export default function Home() {
               Witness Authentication
             </h2>
             <p style={{ fontSize: '24px', color: '#666', marginBottom: '40px', textAlign: 'center' }}>
-              Two (2) Witnesses are required to validate this Will
+              Two (2) Witnesses are required to validate this Nominee Activation
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginBottom: '40px' }}>
@@ -1846,7 +1847,7 @@ export default function Home() {
               ✓
             </div>
             <h2 style={{ fontSize: '48px', fontWeight: 700, color: '#28a745', marginBottom: '30px' }}>
-              Will Successfully Registered with JPN
+              Nominee Activation Successfully Registered with JPN
             </h2>
             <p style={{ fontSize: '28px', color: '#333', marginBottom: '40px', lineHeight: '1.6' }}>
               Please remove your MyKad.<br />
@@ -1891,6 +1892,396 @@ export default function Home() {
         @keyframes pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.7; transform: scale(1.05); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// Environment Scan Screen Component - REMOVED (only in blue project)
+function _EnvironmentScanScreen_removed({ onComplete, onThreatDetected }: { onComplete: () => void; onThreatDetected: () => void }) {
+  const [scanProgress, setScanProgress] = useState(0);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanComplete, setScanComplete] = useState(false);
+  const [aiStatus, setAiStatus] = useState<string[]>([]);
+  const [cameraAccess, setCameraAccess] = useState(false);
+  const [threats, setThreats] = useState<Array<{ x: number; y: number; width: number; height: number; type: string }>>([]);
+  const [isLocking, setIsLocking] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  // Spacebar trigger for threat detection (for testing/demo)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && isScanning && !isLocking && threats.length === 0) {
+        e.preventDefault();
+        const newThreat = {
+          x: 40,
+          y: 40,
+          width: 120,
+          height: 120,
+          type: 'knife'
+        };
+        setThreats([newThreat]);
+        setAiStatus([
+          '⚠️ THREAT DETECTED',
+          'Security protocol activated',
+          'Terminating session...',
+          'Locking IC...'
+        ]);
+        setIsLocking(true);
+        setIsScanning(false);
+        setTimeout(() => {
+          onThreatDetected();
+        }, 2000);
+      }
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isScanning, isLocking, threats.length, onThreatDetected]);
+
+  // Request camera access
+  useEffect(() => {
+    const requestCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: true
+        });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          streamRef.current = stream;
+          setCameraAccess(true);
+          videoRef.current.onloadedmetadata = () => {
+            setIsScanning(true);
+          };
+        }
+      } catch (error) {
+        console.error('Camera access denied:', error);
+        setAiStatus(['Camera access required', 'Please allow camera access to continue']);
+      }
+    };
+    requestCamera();
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  // Scan progress
+  useEffect(() => {
+    if (isScanning && !isLocking) {
+      const interval = setInterval(() => {
+        setScanProgress((prev) => {
+          if (prev >= 100) {
+            setIsScanning(false);
+            setScanComplete(true);
+            return 100;
+          }
+          return prev + 1;
+        });
+      }, 150);
+      return () => clearInterval(interval);
+    }
+  }, [isScanning, isLocking]);
+
+  // AI Status updates
+  useEffect(() => {
+    if (isLocking) return;
+    if (scanProgress < 30) {
+      setAiStatus(['Initializing scan...', 'Camera active', 'Threat detection ready']);
+    } else if (scanProgress < 50) {
+      setAiStatus([
+        'Scanning environment for threats...',
+        'Analyzing background audio for coercion...',
+        'Monitoring for dangerous items...'
+      ]);
+    } else if (scanProgress < 80) {
+      setAiStatus([
+        'Detecting movement patterns...',
+        'Verifying isolation...',
+        'No dangerous items detected so far...'
+      ]);
+    } else if (scanProgress >= 100) {
+      setAiStatus([
+        'Environment secure',
+        'No threats detected',
+        'Scan complete - Safe to proceed'
+      ]);
+    }
+  }, [scanProgress, isLocking]);
+
+  return (
+    <div style={{
+      height: '100vh',
+      width: '100vw',
+      backgroundColor: '#2d3748',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Real Camera Feed */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundColor: '#2d3748',
+        overflow: 'hidden'
+      }}>
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transform: 'scaleX(-1)'
+          }}
+        />
+        {/* Threat Detection Overlays */}
+        {threats.map((threat, idx) => (
+          <div
+            key={idx}
+            style={{
+              position: 'absolute',
+              left: `${threat.x}%`,
+              top: `${threat.y}%`,
+              width: `${threat.width}px`,
+              height: `${threat.height}px`,
+              border: '4px solid #ef4444',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(239, 68, 68, 0.2)',
+              boxShadow: '0 0 30px rgba(239, 68, 68, 0.8)',
+              animation: 'pulse 0.5s infinite',
+              zIndex: 15
+            }}
+          >
+            <div style={{
+              position: 'absolute',
+              top: '-30px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#ef4444',
+              color: '#ffffff',
+              padding: '4px 12px',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: 700,
+              whiteSpace: 'nowrap'
+            }}>
+              ⚠️ THREAT DETECTED
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Instructions Overlay */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        padding: '24px',
+        zIndex: 10,
+        textAlign: 'center'
+      }}>
+        <div style={{ marginBottom: '24px' }}>
+          <div style={{
+            width: '96px',
+            height: '96px',
+            margin: '0 auto 16px',
+            borderRadius: '50%',
+            border: '4px dashed #00d9ff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            animation: 'spin 3s linear infinite'
+          }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(0, 217, 255, 0.3)'
+            }} />
+          </div>
+        </div>
+        <h2 style={{
+          fontSize: '24px',
+          fontWeight: 700,
+          marginBottom: '12px',
+          color: '#ffffff'
+        }}>
+          360° Environment Scan
+        </h2>
+        <p style={{
+          color: '#718096',
+          fontSize: '16px',
+          marginBottom: '24px'
+        }}>
+          Slowly pan your phone 360 degrees around the room
+        </p>
+        {/* Progress Bar */}
+        <div style={{
+          width: '100%',
+          maxWidth: '320px',
+          margin: '0 auto'
+        }}>
+          <div style={{
+            height: '8px',
+            borderRadius: '4px',
+            backgroundColor: '#132f4c',
+            overflow: 'hidden',
+            marginBottom: '8px'
+          }}>
+            <div style={{
+              height: '100%',
+              width: `${scanProgress}%`,
+              backgroundColor: scanComplete ? '#10b981' : '#00d9ff',
+              transition: 'width 0.3s ease',
+              boxShadow: scanComplete ? '0 0 20px rgba(16, 185, 129, 0.5)' : '0 0 20px rgba(0, 217, 255, 0.5)'
+            }} />
+          </div>
+          <p style={{
+            fontSize: '14px',
+            color: '#718096',
+            textAlign: 'center'
+          }}>
+            {scanProgress}% Complete
+          </p>
+        </div>
+      </div>
+
+      {/* AI Status Panel */}
+      <div style={{
+        position: 'absolute',
+        bottom: '128px',
+        left: '24px',
+        right: '24px',
+        zIndex: 10
+      }}>
+        <div style={{
+          backgroundColor: isLocking ? '#7f1d1d' : '#132f4c',
+          borderRadius: '16px',
+          padding: '16px',
+          border: isLocking ? '2px solid #ef4444' : '1px solid #4a5568',
+          boxShadow: isLocking ? '0 0 20px rgba(239, 68, 68, 0.5)' : 'none'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '8px'
+          }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: isLocking ? '#ef4444' : '#00d9ff',
+              animation: 'pulse 1.5s infinite'
+            }} />
+            <p style={{
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#ffffff'
+            }}>
+              {isLocking ? '⚠️ THREAT DETECTED' : 'AI Active'}
+            </p>
+          </div>
+          <div style={{ paddingLeft: '16px' }}>
+            {aiStatus.map((status, idx) => (
+              <p key={idx} style={{
+                fontSize: '12px',
+                color: isLocking ? '#fca5a5' : '#718096',
+                marginBottom: '4px',
+                lineHeight: '1.4',
+                fontWeight: isLocking ? 600 : 400
+              }}>
+                {status}
+              </p>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Success Overlay */}
+      {scanComplete && (
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: 'rgba(10, 25, 41, 0.95)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 20,
+          padding: '24px'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              width: '80px',
+              height: '80px',
+              margin: '0 auto 24px',
+              borderRadius: '50%',
+              backgroundColor: '#10b981',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#ffffff' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 style={{
+              fontSize: '28px',
+              fontWeight: 700,
+              marginBottom: '8px',
+              color: '#ffffff'
+            }}>
+              Environment Secure
+            </h2>
+            <p style={{
+              color: '#718096',
+              fontSize: '16px',
+              marginBottom: '32px'
+            }}>
+              You are alone
+            </p>
+            <button
+              onClick={onComplete}
+              style={{
+                padding: '16px 32px',
+                borderRadius: '12px',
+                border: 'none',
+                backgroundColor: '#00d9ff',
+                color: '#0a1929',
+                fontSize: '16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0, 217, 255, 0.4)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 217, 255, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 217, 255, 0.4)';
+              }}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>
